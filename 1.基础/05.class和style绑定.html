@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>class&style</title>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<style type="text/css">
+	    /* 发现default跟style中的样式顺序有关 */
+		.default{
+			width:100px;
+			height: 100px;
+			background-color: yellow;
+			margin-top:10px;
+		}
+
+		.size{
+			width:200px;
+			height:300px;
+		}
+		.background{
+			background-color: red;
+		}
+	</style>
+</head>
+<body>
+
+	<div id='container'>
+<!-- class -->
+		<div class='default' :class='{size:isSize,background:isBgm}'></div>
+
+		<div class='default' :class='{true:"size",false:"background"}[isSelected]'></div>
+
+		<div class='default' :class='computedAttr'></div>
+		
+		 <div class='default' :class='["size","background"]'></div>
+
+		<div class='default' v-bind:class='["size",{ background: isBgm }]'></div>
+
+		<div class='default' :class='[isSize?"":"size","background"]'></div>
+
+		<my-component class='size background'></my-component>
+
+
+		<div>****************************************</div>
+
+		<div class='default' v-bind:style='{backgroundColor:"green",width:"200px"}'></div>
+
+		<div class='default' v-bind:style='computedStyle'></div>
+
+		<div class='default' :style='[{backgroundColor:"black"},{width:"300px"}]'></div>
+
+		<div class='default' :style='{display:["-webkit-box","-ms-flexbox","flex"]}'></div>
+
+	</div>
+
+	<script type="text/javascript">
+	   //组件必须在new Vue上面 
+		Vue.component('my-component',{
+			template:'<div class="default"></div>'
+		});
+
+		var vm=new Vue({
+			el:'#container',
+			data:{
+				isSize:true,
+				isBgm:false,
+				isSelected:false
+			},
+			computed:{
+				computedAttr:function(){
+					return {
+						size:this.isSize,
+						background:this.isBgm
+					};
+				},
+				computedStyle:function(){
+					return {
+						backgroundColor:"green",
+						width:"200px"
+					};
+				}
+			}
+		});
+
+		
+
+
+	</script>
+
+</body>
+</html>

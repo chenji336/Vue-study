@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>state transition</title>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/tween.js@16.3.4"></script>
+</head>
+<body>
+
+	<div id='container'>
+		<div>
+			<h3>状态动画与观察者 watch</h3>
+			<input type='number' v-model.number='number' step='20'/>
+			<p>{{number}}</p>
+		</div>
+
+		<div>
+			<h3>把过渡放到组件中</h3>
+			<input type='number' v-model.number='number1' step='20' />
+			+
+			<input type='number' v-model.number='number2' step='20' />
+			=
+			{{result}}
+			<div>
+				<animation-inter :number='number1'></animation-inter>
+				+
+				<animation-inter :number='number2'></animation-inter>
+				=
+				<animation-inter :number='result'></animation-inter>
+			</div>
+		</div>
+	</div>
+
+	<script type="text/javascript">
+		Vue.component('animation-inter',{
+			props:{
+				number:{
+					type:Number,
+					required:true
+				}
+			},
+			template:'<span>{{animatedNumber}}</span>',
+			data:function(){
+				return {
+					animatedNumber:0
+				}
+			},
+			watch:{
+				number:function(newValue,oldValue){
+					var vm=this;
+					function animate(){
+						if(TWEEN.update()){
+							requestAnimationFrame(animate);
+						}
+					}
+
+					new TWEEN.Tween({tweeningNumber:oldValue})
+						.easing(TWEEN.Easing.Quadratic.Out)
+						.to({tweeningNumber:newValue},500)
+						.onUpdate(function(){
+							// 不要显示小数
+							 vm.animatedNumber=this.tweeningNumber.toFixed(0);
+						})
+						.start()
+					;
+
+					animate();
+				}
+			},
+			methods:{
+
+			}
+		});
+
+		var vm=new Vue({
+			el:'#container',
+			data:{
+				number:0,
+				animatedNumber:0,
+				number1:0,
+				number2:0
+			},
+			watch:{
+				number:function(newValue,oldValue){
+					var vm=this;
+					function animate(){
+						if(TWEEN.update()){
+							requestAnimationFrame(animate);
+						}
+					}
+
+					new TWEEN.Tween({tweeningNumber:oldValue})
+						.easing(TWEEN.Easing.Quadratic.Out)
+						.to({tweeningNumber:newValue},500)
+						.onUpdate(function(){
+							// 不要显示小数
+							 vm.animatedNumber=this.tweeningNumber.toFixed(0);
+						})
+						.start()
+					;
+
+					animate();
+				}
+			},
+			computed:{
+				result:function(){
+					return this.number1+this.number2;
+				}
+			}
+		});
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>filter</title>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+<body>
+
+	<div id='container'>
+		{{message | capitalize('love')}}
+	</div>
+
+	<script type="text/javascript">
+		// 全局过滤器
+		// Vue.filter('name',function(value){});
+		var vm=new Vue({
+			el:'#container',
+			data:{
+				message:'chenjiMinxi'
+			},
+			filters: {
+				capitalize: function(value,otherValue){
+					if(!value){
+						return;
+					}
+					value = value.toString();
+					return value.charAt(0).toUpperCase() + value.slice(1) + '-' + otherValue;
+				}
+			}
+		});
+	</script>
+
+</body>
+</html>

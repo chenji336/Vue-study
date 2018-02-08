@@ -1,0 +1,366 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>computed&watch</title>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<link href="https://cdn.jsdelivr.net/npm/animate.css@3.5.1" rel="stylesheet" type="text/css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.3/velocity.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.14.1/lodash.min.js"></script>
+	<style type="text/css">
+		.subAbsolute{
+			position: relative;
+		}
+			.subAbsolute button{
+				position:absolute;
+			}
+
+
+		.fade-enter-active, .fade-leave-active{
+			transition: all .5s;
+		}
+		.fade-enter, .fade-leave-to{
+			opacity: 0;
+			transform: translateY(50px)
+		}
+		/*.fade-leave-to{
+			transform: translateX(-50px)
+		}
+		.fade-enter{
+			transform: translateX(50px)
+		}*/
+
+
+		.bounce-enter-active{
+			animation: bounce-in 5s;
+		}
+		.bounce-leave-active{
+			animation: bounce-in 5s reverse;
+		}
+		@keyframes bounce-in{
+			0% {
+				transform: scale(0);
+			}
+			50% {
+				transform: scale(1.5);
+			}
+			100% {
+				transform: scale(1);
+			}
+		}
+
+		.customer-appear-active-class{			
+			transition: all 3s ease;
+		}
+		.customer-appear-class{
+			background-color: red;
+		}
+		.customer-appear-to-class{
+			background-color: black;
+		}
+
+		.list-item{
+			display:inline-block;
+			margin-right:10px;
+		}
+		.list-enter-active, .list-leave-active{
+			transition: all 1s;
+		}
+		.list-enter, .list-leave-to{
+			opacity: 0;
+			transform: translateY(30px);
+		}
+
+
+		.flip-list-move{
+			transition: transform 1s;
+		}
+		/*这个跟上面是等效的*/
+		.flip-list-item{
+			transition: transform 1s;
+		}
+
+		.list-mix-item{
+			/*transition: all 1s;*/
+			display:inline-block;
+			margin-right:10px;
+		}
+		.list-mix-move{
+			transition: all 1s;
+		}
+		.list-mix-enter, .list-mix-leave-to{
+			opacity: 0;
+			transform: translateY(30px);
+		}
+		.list-mix-leave-active{
+			position: absolute;
+		}
+	</style>
+</head>
+<body>
+
+	<div id='container'>
+		<div>
+			<h3>css过渡</h3>
+			<button @click='show = !show'>Toggle</button>
+			<transition name='fade' :duration='{enter:3500,leave:1800}'>
+				<p v-if='show'>hello</p>
+			</transition>	
+		</div>
+
+		<div>
+			<h3>css动画</h3>
+			<button @click='show = !show'>Toggle Show</button>
+			<transition name='bounce' >
+				<p v-if='show'>Look at me!</p>
+			</transition>	
+		</div>
+
+		<div>
+			<h3>自定义过渡类名</h3>
+			<button @click='show = !show'>Toggle Show</button>
+			<!-- name不是必须的 -->
+			<transition 
+				name='custom-classes-transition'
+				enter-active-class='animated tada'
+				leave-active-class='animated bounceOutRight'
+			>
+				<p v-if='show'>hello</p>
+			</transition>	
+		</div>
+
+		<div>
+			<h3>javascript钩子</h3>
+			<button @click='show = !show'>Toggle Show</button>
+			<transition
+				v-on:before-enter='beforeEnter'
+				v-on:enter='enter'
+				v-on:leave='leave'
+				v-bind:css='false'
+			>
+				<p v-if='show'>demo</p>
+			</transition>	
+		</div>
+
+		<div>
+			<h3>初始渲染的过渡 appear</h3>
+			<transition 
+		     appear
+		     appear-class='customer-appear-class'
+		     appear-active-class='customer-appear-active-class'
+		     appear-to-class='customer-appear-to-class'
+			>
+				<div style='width:200px;height:200px'>appear</div>
+			</transition>
+		</div>
+
+		<div>
+			<h3>多元素过渡</h3>
+			<div >
+				<button @click='show1 = !show1'>Toggle</button>
+				<div class='subAbsolute'>
+					<transition name='fade' >
+						<button v-if='show1' key='save' >save</button>
+						<button v-else='!show1' key='edit' >edit</button>
+					</transition>
+				</div>
+			</div>
+			<br><br>
+
+			<button @click='show1 = !show1'>Toggle</button>
+			<div class='subAbsolute'>
+				<transition name='fade' mode='in-out'>
+					<button v-bind:key="show1" >
+	    			{{ show1 ? 'Save' : 'Edit' }}
+				</transition>
+			</div>
+			<br><br>
+
+			<div >
+				<button >save</button>
+				<button >edit</button>
+			</div>
+		</div>
+
+		<div>
+			<h3>多组件过渡</h3>
+			<input type='radio' v-model='picked' value='a-component' />
+			<input type='radio' v-model='picked' value='b-component' />
+			<div>
+				<transition name='fade' mode='out-in'>
+					<component :is='picked'></component>
+				</transition>
+			</div>
+		</div>
+
+
+		<div>
+			<h3>列表的进入离开过渡</h3>
+			<div>
+				<button @click='add'>add</button>
+				<button @click='remove'>remove</button>
+			</div>
+			<transition-group  name='list' tag='p'>
+				<span v-for='item in items' v-bind:key='item' class='list-item'>{{item}}</span>
+			</transition-group>
+		</div>
+		<br><br><br>
+		<div>
+			<h3>列表的排序过渡</h3>
+			<button @click='shuffle'>shuffle</button>
+			<transition-group tag='ul' name='flip-list'>
+				<li v-for='item in items' :key='item' class='flip-list-item'>{{item}}</li>
+			</transition-group>
+		</div>
+		<br>
+		<div>
+			<h3>混合使用demo</h3>
+			<div>
+				<button @click='add'>add</button>
+				<button @click='remove'>remove</button>
+				<button @click='shuffle'>shuffle</button>
+			</div>
+			<transition-group  name='list-mix' tag='p'>
+				<span v-for='item in items' v-bind:key='item' class='list-mix-item'>{{item}}</span>
+			</transition-group>
+		</div>
+
+		<div>
+			<h3>列表交错过渡</h3>
+			<div>
+				<input v-model='query' />
+				<!-- name属性其实用途不大的 -->
+				<transition-group
+					name='staggered-list'
+					tag='ul'
+					v-bind:css='false'
+					v-on:before-enter='beforeEnterList'
+					v-on:enter='enterList'
+					v-on:leave='leaveList'
+				>
+					<li 
+						v-for='(item,index) in computedList'
+						v-bind:key='item.msg'
+						v-bind:data-index='index'
+					>
+						{{item.msg}}
+					</li>
+				</transition-group>
+			</div>
+		</div>
+
+		<div>
+			<h3>可复用的过渡（组件）</h3>
+			<div>
+				<button @click='show1=!show1'>compoentShow</button>
+				<my-transition :show1="show1"></my-transition>
+			</div>
+		</div>
+	
+	</div>
+
+	<script type="text/javascript">
+		Vue.component('my-transition',{
+			props:['show1'],
+			template:'<transition v-on:before-enter="beforeEnter" v-on:enter="enter" v-on:leave="leave"><p v-if="show1">component</p></transition>',
+			methods:{
+				beforeEnter:function(el){
+					el.style.opacity=0;
+				},
+				enter:function(el,done){
+					Velocity(el,{opacity:1},{duration:1000},{complete:done});
+				},
+				leave:function(el,done){
+					Velocity(el,{opacity:0},{duration:1000},{complete:done});
+				}
+			}
+		});
+
+		var vm=new Vue({
+			el:'#container',
+			data:{
+				show:false,
+				show1:false,
+				picked:'',
+				items:[1,2,3,4,5,6,7,8,9],
+				nextNumber:10,
+				query:'',
+				list:[
+					  { msg: 'Bruce Lee' },
+				      { msg: 'Jackie Chan' },
+				      { msg: 'Chuck Norris' },
+				      { msg: 'Jet Li' },
+				      { msg: 'Kung Fury' }
+				]
+			},
+			computed:{
+				computedList:function(){
+					var vm=this;
+					return this.list.filter(function(item){
+						return item.msg.trim().toLowerCase().indexOf(vm.query.toLowerCase())!==-1;
+					});
+				}
+			},
+			methods:{
+				beforeEnter:function(el){
+					el.style.opacity=0;
+					el.style.transformOrigin='left';
+				},
+				enter:function(el,done){
+					Velocity(el,{fontSize:'1.4em',opacity:1},{duration:300});
+					Velocity(el,{fontSize:'1em'},{complete:done});
+				},
+				leave:function(el,done){
+					Velocity(el,{translateX:'15px',rotateZ:'50deg'},{duration:600});
+					Velocity(el,{rotateZ:'100deg'},{loop:2});
+					Velocity(el,{rotateZ:'45deg',translateY:'30px',translateX:'30px',opacity:0},{complete:done});
+				},
+				randomIndex:function(){
+					return Math.floor(Math.random()*this.items.length);
+				},
+				add:function(){
+					this.items.splice(this.randomIndex(),0,this.nextNumber++);
+				},
+				remove:function(){
+					this.items.splice(this.randomIndex(),1);
+				},
+				shuffle:function(){
+					this.items=_.shuffle(this.items);
+				},
+				beforeEnterList:function(el){
+					el.style.opacity=0;
+					el.style.height=0;
+				},
+				enterList:function(el,done){
+					var delay=el.dataset.index*150;
+					setTimeout(function(){
+						Velocity(
+							el,
+							{opacity:1,height:'1.4em'},
+							{complete:done}
+						);
+					},delay);
+				},
+				leaveList:function(el,done){
+					var delay=el.dataset.index*150;
+					setTimeout(function(){
+						Velocity(
+							el,
+							{opacity:0,height:0},
+							{complete:done}
+						);
+					},delay);
+				}
+			},
+			components:{
+				'a-component':{
+					template:'<div>i am a component</div>'
+				},
+				'b-component':{
+					template:'<div>i am b component</div>'
+				}
+			}
+		});
+	</script>
+
+</body>
+</html>

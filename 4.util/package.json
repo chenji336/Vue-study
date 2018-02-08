@@ -1,0 +1,22 @@
+﻿{
+  "name": "first_package",
+  "version": "1.0.0",
+  "description": "no description",
+  "main": "index.js",
+  "dependencies": {
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "no test command"
+  },
+  "repository": {
+    "type": "git",
+    "url": "no "
+  },
+  "keywords": [
+    "cj"
+  ],
+  "author": "cj",
+  "license": "ISC"
+}

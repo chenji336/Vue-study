@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>computed&watch</title>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id='container'>
+    	<input v-focus>
+    	<div v-demo:foo.a.b='msg'></div>
+    	<span v-color-swatch='"red"' v-obj-literal='{a:1,b:2}'>v-color-swatch</span>
+
+    </div>
+
+
+    <script type="text/javascript">
+    // 指令简介
+    Vue.directive('focus',{
+    	// inserted是自带的，当绑定的元素插入到dom中
+    	inserted:function(el){
+    		console.log('inserted-focus start');
+    		el.focus();
+    	}
+    });
+    Vue.directive('demo',{
+    	bind:function(el,binding,vnode){
+            console.log('demo-bind');
+    		var s=JSON.stringify;
+    		el.innerHTML=
+    			'name: ' + s(binding.name) +'<br>' +
+    			'value: ' + s(binding.value) +'<br>' +
+    			'expression: ' + s(binding.expression) +'<br>' +
+    			'argument: ' + s(binding.arg) +'<br>' +
+    			'modifiers: ' + s(binding.modifiers) +'<br>' +
+    			'vnode keys: ' + Object.keys(vnode).join(',')
+    	},
+        inserted:function(el){
+            console.log('demo-inserted');
+        }
+    });
+
+    // 函数简写
+    Vue.directive('color-swatch',function(el,binding){
+    	el.style.backgroundColor=binding.value;
+    });
+
+    // 对象字面量
+    Vue.directive('obj-literal',function(el,binding){
+    	console.log('obj-literal-a:',binding.value.a);
+    	console.log('obj-literal-b:',binding.value.b);
+    })
+   
+    // 也可以
+    // directives:{'focus':{inserted:function(el){}}}}
+   
+
+    // 混合   
+    // 为自定义的选项 'myOption' 注入一个处理器。
+    Vue.mixin({
+        created: function() {
+            var myOption = this.$options.myOption
+            if (myOption) {
+                console.log('Vue.mixin-myOption:',myOption)
+            }
+        }
+    })
+
+
+    var myMixin = {
+        created: function() {
+            this.hello();
+        },
+        methods: {
+            hello: function() {
+                console.log('myMixin-hello from mixin');
+            }
+        }
+    };
+
+    var Component = Vue.extend({
+        mixins: [myMixin],
+        myOption:'Vue.extend-myOption',
+        created: function() {
+            console.log('Vue.extend-from Vue.extend');
+        }
+    });
+    var component = new Component();
+
+    // 跟Vue.extend类似
+    var vm = new Vue({
+    	el:'#container',
+        created: function() {
+            console.log('new Vue-from new Vue');
+        },
+        // 这里的时候会调用myMixin的created,所以会先看到hello from new Vue
+        mixins: [myMixin],
+        methods: {
+            hello: function() {
+                console.log('new Vue-hello from new Vue');
+            }
+        },
+        data:{
+        	msg:'new Vue-hello-msg'
+        }
+    });
+
+     vm.hello();
+
+     
+    new Vue({
+        myOption: 'hello!'
+    })
+
+
+    
+    </script>
+</body>
+
+</html>

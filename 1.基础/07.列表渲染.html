@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>v-for</title>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!-- <script src="https://unpkg.com/vue@1.0.28/dist/vue.js"></script> -->
+</head>
+
+<body>
+    <div id='container'>
+        <!-- array -->
+        <ul>
+            <li v-for='item in items'>{{item}}</li>
+        </ul>
+        <ul>
+            <li v-for='(item,index) in items'>{{item+'-'+index}}</li>
+        </ul>
+        <!-- object -->
+        <ul>
+            <li v-for='item in itemsObj'>{{item}}</li>
+        </ul>
+        <ul>
+            <li v-for='(value,key) in itemsObj'>{{value+'-'+key}}</li>
+        </ul>
+        <ul>
+            <li v-for='(value,key,index) in itemsObj'>{{value+'-'+key+'-'+index}}</li>
+        </ul>
+        <!-- 数组更新检测 -->
+        <div>
+            <button @click='push()'>push</button>
+            <button @click='unshift()'>unshift</button>
+            <button @click='change1()'>等于号赋值</button>
+            <button @click='change2()'>splice赋值</button>
+            <button @click='change3()'>Vue.set赋值</button>
+        </div>
+        <!-- obj 更新检测 -->
+        <div>
+            <button @click='objChange1()'>this.b添加的属性</button>
+            <!-- {{b}} -->
+            <div>
+                <button @click='objChange2()'>通过set来进行属性赋值</button>
+                {{itemsObj.age}}
+            </div>
+            <div>
+                <button @click='objChange3()'>通过assign直接赋值Object.assign(...)</button>
+                {{itemsObj.age+'-'+itemsObj.name}}
+            </div>
+            <div>
+                <button @click='objChange4()'>this.obj=Object.assign(...)</button>
+                {{itemsObj.age+'-'+itemsObj.name}}
+            </div>
+        </div>
+        <!-- 过滤/排序 -->
+        <ul>
+        	<li v-for='item in evenTodos'>{{ item.title }}</li>
+        </ul>
+        <h3>sort</h3>
+        <ul>
+        	<li v-for='item in sortTodos'>{{ item.id+'--'+item.title }}</li>
+        </ul>
+
+         <ul>
+        	<li v-for='item in even(todos)'>{{ item.title }}</li>
+        </ul>
+        <!-- 范围 -->
+        <ul>
+        	<li v-for='item in 10'>{{ item }}</li>
+        </ul>
+        <!-- 组件 -->
+        <input v-model='newTodoText' v-on:keyup.enter='addNewTodo'></input>
+        <ul>
+        	<todo-item v-for='(item,index) in todos' v-on:remove='todos.splice(index,1)' :title='item.title' :key='item.id'></todo-item>
+        </ul>
+
+        <ul>
+        	<li is='todo-item' v-for='(item,index) in todos' v-on:remove='todos.splice(index,1)' :title='item.title' :key='item.id'></li>
+        </ul>
+    </div>
+    <script type="text/javascript">
+
+	Vue.component('todo-item',{
+		template:'<li>{{title}}<button v-on:click="$emit(\'remove\')">X</button></li>',
+		props:['title']
+	});
+
+
+    var vm = new Vue({
+        el: '#container',
+        data: {
+            items: ['chenji', 'minxi', 'lg', 'chenji'],
+            itemsObj: { c: 'chenji', b: 'minxi', a: 'lg', c: 'chenji' },
+            itemsObjExtend: [{ a: 1 }, { a: 1 }],
+            todos: [{
+                    id: 1,
+                    title: 'Do the dishes',
+                },
+                {
+                    id: 2,
+                    title: 'Take out the trash',
+                },
+                {
+                    id: 3,
+                    title: 'Mow the lawn'
+                }
+            ],
+            newTodoText:'',
+            nextTodoId:4
+        },
+        computed:{
+        	evenTodos:function(){
+        		return this.todos.filter(function(item){
+        			return item.id%2===0;
+        		})
+        	},
+        	sortTodos:function(){
+        		return this.todos.sort(function(item1,item2){
+        			return item1.id < item2.id;
+        		})
+        	}
+        },
+        methods: {
+            push: function() {
+                this.items.push('push-new');
+            },
+            unshift: function() {
+                this.items.unshift('unshift-new');
+            },
+            change1: function() {
+                this.items[0] = "=号赋值";
+            },
+            change2: function() {
+                this.items.splice(0, 1, 'splice赋值');
+            },
+            change3: function() {
+                // Vue.set(this.items,0,'Vue.set赋值');
+                // 与上面是等效的
+                this.$set(this.items, 0, 'Vue.set赋值');
+            },
+            objChange1: function() {
+                // 无论用this还是vm，vue都会提示报错
+                this.b = 'b';
+            },
+            objChange2: function() {
+                // 使用这个无效
+                // this.itemsObj.age=18;
+                this.$set(this.itemsObj, 'age', 18);
+                Vue.set(this.itemsObj, 'age', 28);
+            },
+            objChange3: function() {
+                // 下面两个都无效
+                Object.assign(this.itemsObj, { age: 17, name: 'xx' });
+                // this.itemsObj=Object.assign(this.itemsObj,{age:17,name:'xx'});
+            },
+            objChange4: function() {
+                this.itemsObj = Object.assign({}, this.itemsObj, { age: 17, name: 'xx' });
+            },
+            even:function(objs){
+            	return objs.filter(function(item){
+        			return item.id%2===0;
+        		});
+            },
+            addNewTodo:function(){
+            	this.todos.push({
+            		id:this.nextTodoId++,
+            		title:this.newTodoText
+            	});
+            }
+
+        }
+    });
+
+
+    </script>
+</body>
+
+</html>

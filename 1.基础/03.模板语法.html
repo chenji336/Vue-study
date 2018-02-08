@@ -1,0 +1,66 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>templateSyntax</title>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+<body>
+
+<div id='container' >
+<!-- 插值 -->
+	<!-- 文本 -->
+	<span v-once>{{ msg }}</span>	
+	<div><span>{{ msg }}</span>	</div>
+	<button  v-on:click='change()'>change</button>
+
+	<!-- 原始HTML -->
+	<div v-html='htmlValue'></div>
+	<div >{{ htmlValue }}</div>
+
+	<!-- 特性 id/title/diabled 
+	注意：falsy的时候失效（0/undefined/false）-->
+	<div v-bind:id='msg'></div>
+
+	<!-- 使用javascript表达式
+	注意：一定要是表达式，不能是语句（if的话需要使用三元表达式来替换） -->
+	<div v-bind:id='"div-"+msg'>{{ msg+'div' }}</div>
+
+<!-- 指令 -->
+	<div v-if='seen'>v-if就是指令</div>
+	<!-- 参数 -->
+	<a v-bind:href="baidu">你看到的v-bind:href，这里的href就是参数</a>
+	<!-- 修饰符
+	你可以去掉.prevent看看效果，会发现跳转到了百度页面 -->
+	<div><a v-bind:href="baidu" v-on:click.prevent='preventClick()'>这里的.prevent就是修饰符，相当于在事件中调用了event.preventDefault()</a></div>
+
+<!-- 缩写brief/abbreviate -->
+	<a :href="baidu">：你看到的是缩写形式</a>
+	<button  @click='change()'>@change的缩写方式</button>
+</div>
+
+
+<script type="text/javascript">
+	// **插值
+	// 文本
+	var vm=new Vue({
+		el:'#container',
+		data:{
+			msg:'one',
+			htmlValue:'<span style="color:red">htmlValue</span>',
+			seen:true,
+			baidu:'http://baidu.com'
+		},
+		methods:{
+			change:function(){
+				console.log(this.msg);
+				this.msg='two';
+				console.log(this.msg);
+			},
+			preventClick:function(){
+				console.log('preventClick-start');
+			}
+		}
+	});
+</script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>vueOne</title>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+<body>
+	<div id="app1">
+		{{ message }}
+	</div> 
+	<hr />
+
+	<div id="app-2">
+		<span v-bind:title="message">
+			<!-- <span title={{message}}> -->
+			鼠标悬停，你可以看到一些提示信息。
+		</span>
+	</div>
+	<hr />
+
+	<div id='app-3'>
+		<p v-if='seen'>你看到我了</p>
+	</div>
+	<hr />
+
+	<div id='app-4'>
+		<ol>
+			<li v-for='todo in todos'>
+				{{todo.text}}
+			</li>
+		</ol>
+	</div>
+	<hr />
+
+	<!-- 处理用户输入 -->
+	<div id='app-5'>
+		<p>{{message}}</p>
+		<button v-on:click='reverseMessage()'>进行反转</button>
+	</div>
+	<hr />
+
+	<!-- ？？ 双项绑定，虽然有单向绑定但是内置的机制还是单向绑定 -->
+	<div id='app-6'>
+		<input v-model='message' />
+		<p>{{message}}</p>
+	</div>
+	<hr />
+
+	<!-- 组件应用构建，默认的是单向绑定，组件不影响父类 -->
+	<div id='app-7'>
+		<ol>
+			<todo-item v-for='item in groceryList' v-bind:todo='item'></todo-item>
+		</ol>
+		<br>
+		<ol>
+			<todo-item-new v-for='item in groceryList' v-bind='item'></todo-item-new>
+		</ol>
+	</div>
+	
+	<hr />
+
+	<script>
+	//  script写在下面不需要window.onload
+		// window.onload=function(){
+			var app = new Vue({
+				el: '#app1',
+				data: {
+					message: 'Hello vue!'
+				}
+			});
+
+			var app2=new Vue({
+				el:'#app-2',
+				data: {
+					message:"页面加载于"+new Date()
+				}
+			});
+
+			var app3=new Vue({
+				el:'#app-3',
+				data:{
+					seen:true
+				}
+			});
+
+			var app4=new Vue({
+				el:'#app-4',
+				data:{
+					todos:[
+						{text:'学习javascript'},
+						{text:'学习vue'},
+						{text:'整一个牛项目'}
+					]
+				}
+			});
+
+			// 经过Vue之后app4相当于是document.getElementById('app-4'),data相当于就是一个对象了，不过不显示出来了
+			app4.todos.push({text:"test-new"});
+
+			var app5=new Vue({
+				el:'#app-5',
+				data:{
+					message:'Hello Minxi'
+				},
+				methods:{
+					reverseMessage:function(){
+						this.message=this.message.split('').reverse().join('');
+					}
+				}
+			});
+
+			var app6=new Vue({
+				el:'#app-6',
+				data:{
+					message:'message'
+				}
+			});
+
+			// 定义组件（跟命令分开了，angular中有模板的指令也可以定义为组件）
+			// 理解成directive
+			Vue.component('todo-item',{
+				// todo-item接受一个prop的属性,这里是todo，来自父类
+				// 不要忘记添加引号
+				// 理解成directive中的scope：{}
+				props:['todo'],
+				// 这里还是使用todo前面的给自定的指令使用的
+				template:'<li>text:{{ todo.text }}/price:{{todo.price}}</li>'
+			});
+
+			Vue.component('todo-item-new',{
+				// todo-item接受一个prop的属性,这里是todo，来自父类
+				// 不要忘记添加引号
+				// 理解成directive中的scope：{}
+				props:['text','price'],
+				// 这里还是使用todo前面的给自定的指令使用的
+				template:'<li>text:{{ text }}/price:{{price}}</li>'
+			});
+
+			var app7=new Vue({
+				el:'#app-7',
+				data:{
+					groceryList:[
+						{text:'蔬菜',price:18},
+						{text:'奶酪',price:1},
+						{text:'随便什么东西',price:1}
+					]
+				}
+			});
+	// }
+</script>
+</body>
+</html>

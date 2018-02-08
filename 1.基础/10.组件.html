@@ -1,0 +1,367 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>component</title>
+	<script src="https://cdn.jsdelivr.net/npm/vue@2.4.4/dist/vue.js"></script>
+	<script type="text/x-template" id='xTemplate'>
+		<div>我是x-template里面的内容</div>
+	</script>
+</head>
+<body>
+
+	<div id='container'>
+		<my-component></my-component>
+		<br>
+		<my-part-component></my-part-component>
+		<br>
+		<table>
+        	<my-row></my-row>
+    	</table>
+    	<br>
+    	<table>
+        	<tr is='my-part-row'></tr>
+    	</table>
+    	<br>
+    	<ul>
+			<my-li></my-li>
+			<my-li></my-li>
+		</ul>
+		<br>
+		<!-- 同一个对象，组件会相互影响，所以需要使用返回函数 -->
+		<simple-same-component v-for='item in 3' :key='item'></simple-same-component>
+	    <br>
+	    <simple-component v-for='item in 3' :key='item'></simple-component>
+
+	    <h3>props动态：一个对象传递可以用到component多个属性</h3>
+		<ol>
+			<todo-item-new v-for='item in groceryList' v-bind='item' key='item.id'></todo-item-new>
+		</ol>
+
+		<h3>字面量语法 vs 动态语法</h3>
+		<div><liter-dynamic msg='1'></liter-dynamic></div>
+		<div><liter-dynamic :msg='1'></liter-dynamic></div>
+
+		<h3>单项流</h3>
+		<single-flow :initial='initialData'></single-flow>
+		<div>dadInitialData:{{initialData}}</div>
+		<h4>------单项流Object</h4>
+		<single-flow-object :initial-object='initialObject'></single-flow-object>
+		<div>dadInitialData:{{initialObject.data}}</div>
+
+		<h3>prop验证</h3>
+		<prop-validate :prop-a='100' prop-b='requiredB' prop-c='cbb' :prop-d='111' :prop-e='{message:"newHello"}' prop-f='11' prop-g='1aaab'></prop-validate>
+
+		<h2>自定义事件</h2>
+		<br>
+		<h3>v-on自定义事件</h3>
+		<div>
+			<p>{{total}}</p>
+			<button-counter @increment='incrementTotal'></button-counter>
+			<button-counter @increment='incrementTotal' ></button-counter>
+		</div>
+
+		<h3>给组件绑定原生事件</h3>
+		<button-native @click.native='incrementCounter' :counter='counter'></button-native>
+
+		<h3>.sync</h3>
+		<p>{{bar}}</p>
+		<button-sync :foo.sync='bar'></button-sync>
+		<button-sync :foo='bar' @update:foo='val => bar=val'></button-sync>
+		<button-sync :foo='bar' @update:foo='syncClick(arguments)'></button-sync>
+
+		<h3>自定义事件表单输入</h3>
+		<p>{{initialData}}</p>
+		<input v-model='initialData'></input>
+		<!-- 下面的语法糖 -->
+		<input v-bind:value='initialData' v-on:input='initialData=$event.target.value'></input>
+		<!-- 如果是用的组件相当于下面 -->
+		<!-- <input v-bind:value='initialData' v-on:input='initialData=arguments[0]'></input> -->
+
+		<currency-input v-model='price'></currency-input>
+
+		<h3>定制组件的v-model 2.2.0添加</h3>
+		<p>{{foo}}</p>
+		<my-checkbox v-model='foo' value='some value'></my-checkbox>
+
+		<h3>使用插槽分发内容slot</h3>
+		<div>
+			<h1>我是父</h1>
+			<my-child>
+				<p>我是父作用域内容</p>
+			</my-child>
+		</div>
+
+		<my-slot-name>
+		    <p>我虽然是在slot name=header的上面，但是我还是被放到了在中间的默认插槽里面</p>
+			<header slot='header'>我是有slotname的header</header>
+			<p>我是第一行内容，填充默认的slot</p>
+			<p>我是第二行内容，填充默认的slot</p>
+			<!-- <footer slot='footer'>我是有slotname的footer</footer> -->
+		</my-slot-name>
+
+		<br>
+		<my-slot-scope>
+			<template scope='slotScope'>
+			    <p>hello from parent</p>
+				<p>作用域插槽内容:{{slotScope.aaa}}</p>
+			</template>
+		</my-slot-scope>
+
+		<h3>动态组件-dynamicComponent</h3>
+		<component :is='currentView'></component>
+		<button @click='changeView'>changeView</button>
+
+		<h3>杂项</h3>
+		<my-child-inline>
+			<p>内联的inline-template进行操作</p>
+		</my-child-inline>
+		<my-child-inline inline-template>
+			<p>内联的inline-template进行操作</p>
+		</my-child-inline>
+
+		<h4>----异步组件</h4>
+		<async-example></async-example>
+
+		<x-template-component></x-template-component>
+	</div>
+
+	<script type="text/javascript">
+
+		var data={counter:0};
+
+		Vue.component('my-component',{
+			template:'<div>i am a new compoent</div>'
+		});
+
+		Vue.component('my-li',{
+			template:'<li>我是li结点:{{msg}}</li>',
+			data:function(){
+				return {
+					msg:'componentDataMsg'
+				};
+			}
+		});
+
+		Vue.component('myRow', {
+        	template: '<tr>行元素</tr>'
+    	});
+
+		Vue.component('simple-same-component',{
+			template:'<button @click="counter+=1">{{counter}}</button>',
+			data:function(){
+				return data;
+			}
+		});
+
+		Vue.component('simple-component',{
+			template:'<button @click="counter+=1">{{counter}}</button>',
+			data:function(){
+				return {counter:0};
+			}
+		});
+
+		Vue.component('todo-item-new',{
+			// todo-item接受一个prop的属性,这里是todo，来自父类
+			// 不要忘记添加引号
+			// 理解成directive中的scope：{}
+			props:['text','price'],
+			// 这里还是使用todo前面的给自定的指令使用的
+			template:'<li>text:{{ text }}/price:{{price}}</li>'
+		});
+
+		Vue.component('literDynamic',{
+			props:['msg'],
+			template:'<span>msg:{{msg}}<br>msgType:{{typeof msg}}</span>'
+		});
+
+		Vue.component('singleFlow',{
+			props:['initial'],
+			template:'<div><input v-model="initial"/></div>'
+		});
+
+		Vue.component('singleFlowObject',{
+			props:['initialObject'],
+			template:'<div><input v-model="initialObject.data" /></div>'
+		});
+
+		Vue.component('propValidate',{
+			props:{
+				propA:{
+					type:Number
+				},
+				propB:{
+					type:String,
+					required:true
+				},
+				propC:{
+					type:[Number,String]
+				},
+				propD:{
+					type:Number,
+					default:100
+				},
+				propE:{
+					type:Object,
+					default:function(){
+						return {message:'hello'};
+					}
+				},
+				propF:{
+					validator:function(value){
+						return value > 10;
+					}
+				},
+				propG:{type:null}
+			},
+			template:'<div>propA:{{propA}}<br>propB:{{propB}}<br>propC:{{propC}}<br>propD:{{propD}}<br>propE:{{propE}}<br>propF:{{propF}}<br>propG:{{propG}}<br></div>'
+		});
+
+		// *************************************************自定义事件********************************************************88
+		Vue.component('button-counter',{
+			template:'<button @click="incrementCounter">{{counter}}</button>',
+			data:function(){
+				return {
+					counter:0
+				};
+			},
+			methods:{
+				incrementCounter:function(){
+					this.counter++;
+					this.$emit('increment');
+				}
+			}
+		});
+
+		Vue.component('buttonNative',{
+			props:['counter'],
+			template:'<button>{{counter}}</button>'
+		});
+
+		Vue.component('buttonSync',{
+			props:['foo'],
+			template:'<button @click="syncClick">{{"syncClick-"+foo}}</button>',
+			methods:{
+				syncClick:function(){
+					this.$emit('update:foo',100);
+				}
+			}
+		});
+
+		Vue.component('currency-input',{
+			props:['value'],
+			template:'<input ref="input" v-bind:value="value" v-on:input="updateValue($event.target.value)" />',
+			methods:{
+				updateValue:function(value){
+					var formattedValue=value
+						.trim()
+						.slice(
+							0,
+							value.indexOf('.')===-1
+							? value.length
+							: value.indexOf('.')+3
+							);
+					if(formattedValue!==value){
+						this.$refs.input.value=formattedValue;
+					}
+					this.$emit('input',Number(formattedValue));
+				}
+			}
+		});
+
+		Vue.component('my-checkbox',{
+			model:{
+				prop:'checked',
+				event:'change'
+			},
+			props:{
+				checked:Boolean,
+				// this allows using the `value` prop for a different purpose 
+				value:String
+			},
+			template:'<input type="checkbox" value="chenji" v-on:change="updateCheckboxValue($event.target.checked,$event)" />',
+			methods:{
+				updateCheckboxValue:function(checked,event){
+					this.$emit('change',checked);
+				}
+			}
+		});
+
+		Vue.component('my-child',{
+			template:'<div><h2>我是子</h2><slot>这是我的插槽，当父没有放内容在我这个组件之间的话我就会显示</slot></div>'
+		});
+
+		Vue.component('my-slot-name',{
+			template:'<div><header><slot name="header"></slot></header><div><slot>这是我的插槽，当父没有放内容在我这个组件之间的话我就会显示</slot></div><footer><slot name="footer">我是默认的footer，我在子组件里</slot></footer></div>'
+		});
+
+		Vue.component('my-slot-scope',{
+			template:'<div><slot aaa="你好啊！我是子组件的text内容啊">你好，我是默认的内容</slot></div>'
+		});
+
+		Vue.component('my-child-inline',{
+			template:'<div><h2>我是子</h2><p>简单的子p</p></div>'
+		});
+
+		Vue.component('async-example',function(resolve,reject){
+			setTimeout(function(){
+				resolve({
+					template:'<div>我是异步组件async-example</div>'
+				});
+			},1000);
+		});
+
+		Vue.component('x-template-component',{
+			template:'#xTemplate'
+		});
+
+
+		var vm=new Vue({
+			el:'#container',
+			data:{
+				groceryList:[
+					{text:'蔬菜',price:18},
+					{text:'奶酪',price:1},
+					{text:'随便什么东西',price:1}
+				],
+				initialData:'dadData',
+				initialObject:{data:'dadObjectData'},
+				total:0,
+				counter:0,
+				bar:0,
+				price:0,
+				foo:'',
+				currentView:'component1'
+			},
+			components:{
+				'my-part-component':{
+					template:'<div>i am a new part compoent</div>'
+				},
+				'myPartRow':{
+					template: '<tr>行元素</tr>'
+				},
+				'component1':{
+					template:'<div>我是component1</div>'
+				},
+				'component2':{
+					template:'<div>我是component2</div>'
+				}
+			},
+			methods:{
+				incrementTotal:function(){
+					this.total++;
+				},
+				incrementCounter:function(){
+					this.counter++;
+				},
+				syncClick:function(arg){
+					this.bar=arg[0];
+				},
+				changeView:function(){
+					this.currentView='component2';
+				}
+			}
+		});
+	</script>
+
+</body>
+</html>

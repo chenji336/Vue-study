@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>v-if</title>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id='container'>
+        <div v-if='Math.random()>0.3'>
+            <div>Math.random()>0.3</div>
+            <div>我是第一条数据</div>
+            <div><span>我不想包含在template里面</span></div>
+        </div>
+        <!-- 不会渲染出template -->
+        <template v-else-if='Math.random()>0.6'>
+            <div>Math.random()>0.6</div>
+            <div>我是第二条</div>
+            <div><span>我被包裹在了template里面</span></div>
+        </template>
+        <div v-else>
+            <div>Math.random()<=0.3
+            </div>
+        </div>
+        <div>*****************</div>
+
+        <!-- key的使用 -->
+        <template v-if="loginType === 'username'">
+            <label>Username</label>
+            <input placeholder="Enter your username">
+        </template>
+        <template v-else>
+            <label>Email</label>
+            <input placeholder="Enter your email address">
+        </template>
+
+
+
+        <div>*****************************使用了key的template*****************************</div>
+        <template v-if="loginType === 'username'" >
+            <label>Username</label>
+            <input placeholder="Enter your username" key='key1'>
+        </template>
+        <template v-else>
+            <label>Email</label>
+            <input placeholder="Enter your email address" key='key2'>
+        </template>
+        <div><button @click='trigger'>trigger</button></div>
+
+    </div>
+     <script type="text/javascript">
+        var vm = new Vue({
+            el: '#container',
+            data: {
+            	loginType:'username'
+            },
+            methods:{
+            	trigger:function(){
+            		this.loginType=this.loginType==='username'?'':'username';
+            	}
+            }
+        });
+        </script>
+</body>
+
+</html>

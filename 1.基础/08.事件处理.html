@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>event processing</title>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id='container'>
+        <div>
+            <button @click='count+=1'>点击增加</button>
+            {{ count }}
+        </div>
+
+         <div>
+           <a  href="http://baidu.com" @click='aClick'>aClick</a>
+           <a href="http://baidu.com" @click.prevent='aClick'>aClickPrevent</a>
+        </div>
+
+         <div>
+            <a  href="http://baidu.com" @click='say("hello",$event)'>say(hello)</a>
+        </div>
+
+        <!-- 事件修饰 -->
+        <div id='div' class='div' @click.once='eventModifier' style='width:300px;height:300px;border:1px solid #666666'>
+        	<div id='div-1' class='div-1' @click='eventModifier' style='width:200px;height:200px;margin:50px 0 50px 50px;border:1px solid #666666'>
+        		<div id='div-1-1' class='div-1-1' @click='eventModifier' style='width:100px;height:100px;margin:50px 0 50px 50px;border:1px solid #666666'></div>
+        	</div>
+        </div>
+    </div>
+    <script type="text/javascript">
+    var vm = new Vue({
+        el: '#container',
+        data: {
+            count: 1
+        },
+        methods:{
+        	aClick:function(event){
+        		event.preventDefault();
+        		console.log('aClick');
+        	},
+        	say:function(msg,event){
+        		event.preventDefault();
+        		console.log(msg===undefined?'null':msg);
+        	},
+        	eventModifier:function(event){
+        		console.log(event.type+'-'+event.currentTarget.id+'--'+(event.currentTarget==event.target)+'-'+event.eventPhase);
+        	}
+        }
+    });
+    </script>
+</body>
+
+</html>

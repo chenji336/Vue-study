@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title>renderFunction</title>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <style type="text/css">
+        li {
+            list-style: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='container'>
+        <anchored-heading :level='2'>hello anchored heading</anchored-heading>
+        <anchored-heading-a :level='1'>hello anchored heading</anchored-heading-a>
+        <component-if-for :items='itemData'></component-if-for>
+        <component-model @input22='inputFn'></component-model>
+
+        <myslot>  
+           this is slot
+        </myslot> 
+
+        <myslot-scope>  
+            <template scope="props">  
+                <div>{{props.text}}</div>  
+            </template>  
+        </myslot-scope> 
+    </div>
+    <script type="text/x-template" id='anchored-heading-template'>
+        <!-- 这种方法如果h1-h6则显的很冗余 -->
+        <h1 v-if='level===1'>
+			<slot></slot>
+		</h1>
+        <h2 v-else-if='level===2'>
+			<slot></slot>
+		</h2>
+        <h3 v-else='level===3'>
+			<slot></slot>
+		</h3>
+    </script>
+    <script type="text/javascript">
+    Vue.component('anchored-heading', {
+        // template:'#anchored-heading-template',
+        render: function(createElement) {
+            // 使用render看起来清爽多了
+            return createElement(
+                'h' + this.level,
+                // 如果不适用下面的卡槽，使用‘chenjitest’就会显示chenjitest
+                this.$slots.default
+                // 'render-createElement'
+            );
+        },
+        props: {
+            level: {
+                type: Number,
+                required: true
+            }
+        }
+    });
+
+    var getChildrenTextContent = function(children) {
+        return children.map(function(node) {
+            return node.children ?
+                getChildrenTextContent(node.children) :
+                node.text
+        }).join('')
+    }
+
+    Vue.component('anchored-heading-a', {
+        render: function(createElement) {
+            // create kebabCase id
+            var headingId = getChildrenTextContent(this.$slots.default)
+                .toLowerCase()
+                .replace(/\W+/g, '-')
+                .replace(/(^\-|\-$)/g, '')
+
+            return createElement(
+                'h' + this.level, [
+                    createElement('a', {
+                        attrs: {
+                            name: headingId,
+                            href: '#' + headingId
+                        }
+                    }, this.$slots.default)
+                ]
+            )
+        },
+        props: {
+            level: {
+                type: Number,
+                required: true
+            }
+        }
+    })
+
+    Vue.component('component-if-for',{
+        props: {
+            items: {
+                type: Array,
+                required: true
+            }
+        },
+        render: function(createElement){
+            if(this.items.length){
+                return createElement(
+                    'ul',
+                    this.items.map(function(item){
+                        return createElement(
+                            'li',
+                            item.name
+                        );
+                    })
+                );
+            }else{
+                return createElement(
+                    'p',
+                    'no items found.'
+                );
+            }
+            
+        }
+    });
+
+    Vue.component('component-model',{
+        props: {
+
+        },
+        render: function(createElement){
+            var self = this;
+            return createElement(
+                'input',
+                {
+                    domProps:{
+                        value: 100
+                    },
+                    on:{
+                        input:function(event){
+                            self.value=event.target.value;
+                            self.$emit('input22',self.value);
+                        }
+                    }
+                }
+            );
+        }
+    });
+
+    // slot详细讲解http://blog.csdn.net/wngzhem/article/details/54344191
+    // 想知道多个slot使用的可以看上面的详细讲解
+    Vue.component('myslot',{  
+        render:function(createElement){  
+            var he=createElement('div',{domProps:{innerHTML:'this child div'}});  
+            return createElement('div',[he,this.$slots.default])  
+        }  
+    }); 
+
+    Vue.component('myslot-scope',{
+        render:function(createElement){
+            var he=createElement('div',{domProps:{innerHTML:'this child div'}});  
+            return createElement('div',[he,this.$scopedSlots.default({  
+                text:'hello scope'  
+            })])  
+        }
+    });
+
+
+    var vm = new Vue({
+        el: '#container',
+        data: {
+            itemData:[{name:'item1'},{name:'item2'},{name:'item3'},{name:'item4'}],
+            msg:'i am slot from vm-data'
+        },
+        methods: {
+            inputFn: function(value){
+                console.log('value:',value);
+            }
+        }
+    });
+    </script>
+</body>
+
+</html>

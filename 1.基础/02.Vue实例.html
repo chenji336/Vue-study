@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Vue实例</title>
+	<!-- 所有渲染的属性都是按照vm中的属性来的，不是按照dataValue -->
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+<body>
+	<div id='example'>
+		{{a}}---{{b}}--{{c}}
+	</div>
+	<script>
+		// 构造函数
+		// 没有完全按照MVVM来进行，但是还是受到了他的影响，一般实例vm，还可以进行vue实例的扩展 Vue.extend({})
+
+		// 属性和方法
+		var dataValue={a:1};
+		// 我可以理解成new Vue 类似于 angular中的controller
+		// el就是其大的作用域
+		var vm=new Vue({
+			el:'#example',
+			data:dataValue,
+			created:function(){
+				console.log('created-a:',this.a);
+				// this代表着vm，不会给dataValue中的属性赋值
+				this.c="c";
+			}
+		});
+
+		console.log('----------我已经脱离vm了------------------');
+
+		console.log('dataValue.c:',dataValue.c,'vm.c:',vm.c)
+
+		// 如果你在dataValue中没有定义这么一个b属性，那么你在vm中对b进行改变，dataValue中是接受不到的
+		// 你可以对dataValue进行初始化
+		vm.b='vm-b';
+		console.log("dataValue.b=",dataValue.b);
+
+		// 如果你不是在Vue中初始化的dataValue中的某个属性值，那么vm也不能知道这个值
+		dataValue.b='dataValue-b';
+		console.log("dataValue.b=",dataValue.b,"vm.b=",vm.b);
+
+		console.log("vm.a===dataValue.a",vm.a===dataValue.a);
+		vm.a=2;
+		console.log("vm.a= 2,dataValue.a=",dataValue.a);
+		dataValue.a=3;
+		console.log("dataValue.a=3,vm.a=",vm.a);
+
+		console.log("vm.$data=",vm.$data);
+		console.log("vm.$data===dataValue",vm.$data===dataValue);
+		console.log("vm.$el===document.getElementById('example')",vm.$el===document.getElementById('example'));
+		// 监控如果写在这里，上面的都不会进行监控
+		// angular无论是在哪里都会进行监听
+		// 不过在同一个位置编写的话确实只是监听一次
+		vm.$watch('a',function(newValue,oldValue){
+			console.log('newValue:'+newValue+'---'+'oldValue:'+oldValue);
+		});
+
+		// 虽然下面改变了两次，但是只会触发一次$watch，newValue:5 oldValue:3 
+		// 这样应该就可以提高效率
+		dataValue.a=4;
+		console.log(vm.a);
+		dataValue.a=5;
+		console.log(vm.a);
+		vm.a=6;
+		console.log(dataValue.a);
+		vm.a=7;
+		console.log(dataValue.a);
+		dataValue.a=8;
+		console.log(vm.a);
+	</script>
+</body>
+</html>
