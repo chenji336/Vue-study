@@ -1,6 +1,10 @@
 const path = require('path')
+const HTMLPlugin = require('html-webpack-plugin')
 
-module.exports = {
+console.log('process.env.NODE_ENV:',process.env.NODE_ENV)
+const dev = process.env.NODE_ENV === 'development'
+
+let config = {
 	entry: path.join(__dirname,'src/index.js'),
 	output: {
 		filename: 'bundle.js',
@@ -40,5 +44,20 @@ module.exports = {
 				]
 			}
 		]
+	},
+	plugins: [
+		new HTMLPlugin()
+	]
+}
+
+if (dev) {
+	config.devServer = {
+		host: '0.0.0.0',
+		port: '8088',
+		overlay: {
+			errors: true
+		}
 	}
 }
+
+module.exports = config
