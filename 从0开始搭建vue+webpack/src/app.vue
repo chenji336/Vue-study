@@ -1,4 +1,4 @@
-<template>
+﻿<template>
 	<div id='test'>{{text}}</div>
 </template>
 
@@ -6,7 +6,7 @@
 	export default {
 		data() {
 			return {
-				text: 'abc'
+				text: 'abcde'
 			}
 		}
 	}
