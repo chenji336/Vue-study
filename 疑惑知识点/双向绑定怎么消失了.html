@@ -1,0 +1,55 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <title></title>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <!-- 如果要实现双向绑定的话，需要val里面有放set方法，这里默认是get方法 -->
+</head>
+
+<body>
+    <div id="app">
+        <input type="text" v-model="val" />
+        <span>{{val}}</span>
+   
+   		<br>
+        <p> {{fullName}} </p>
+        <input type="text" v-model="firstName"><br>
+        <input type="text" v-model="lastName">
+    </div>
+    <script type="text/javascript">
+    var vm = new Vue({
+        el: "#app",
+        data: {
+            number: 1,
+            firstName: 'Foo',
+            lastName: 'Bar'
+        },
+        computed: {
+            val: function() {
+                return this.number + 1
+            },
+            fullName: function() {
+                console.log('computed getter...')
+                return this.firstName + ' ' + this.lastName
+            }
+        }
+        // ,
+        // computed: {
+        //     val: {
+        //     	get: function() {
+        //     		return this.firstName
+        //     	},
+        //     	set:function(newVal) {
+        //     		this.firstName = newVal
+        //     	}
+        //     }
+        // }
+
+    });
+    console.log(vm.val);
+    // vm.$val = "11111";
+    </script>
+</body>
+
+</html>
