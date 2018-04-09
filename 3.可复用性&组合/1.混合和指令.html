@@ -11,11 +11,22 @@
     	<input v-focus>
     	<div v-demo:foo.a.b='msg'></div>
     	<span v-color-swatch='"red"' v-obj-literal='{a:1,b:2}'>v-color-swatch</span>
-
+        <button @click='btnCLickShowHide'>showMe</button> <br>
+        <div v-self-show='isShow'>我显示出来了</div>
     </div>
 
 
     <script type="text/javascript">
+    // 自己写一个v-show
+    Vue.directive('self-show',{
+        update: function(el,binding){
+            console.log('el',el);
+            console.log('self-show.value:',binding.value);
+            console.log('self-show-this.isShow:',binding.value)
+            el.style.display = binding.value ? '' : 'none'
+        }
+    });
+
     // 指令简介
     Vue.directive('focus',{
     	// inserted是自带的，当绑定的元素插入到dom中
@@ -42,6 +53,7 @@
     });
 
     // 函数简写
+    // bind和update共用一个函数
     Vue.directive('color-swatch',function(el,binding){
     	el.style.backgroundColor=binding.value;
     });
@@ -99,10 +111,14 @@
         methods: {
             hello: function() {
                 console.log('new Vue-hello from new Vue');
+            },
+            btnCLickShowHide: function() {
+                this.isShow = !this.isShow;
             }
         },
         data:{
-        	msg:'new Vue-hello-msg'
+        	msg:'new Vue-hello-msg',
+            isShow: true
         }
     });
 
